@@ -46,6 +46,37 @@ describe('Jest Builder', () => {
     );
   });
 
+  it('should send appropriate options to jestCLI when fileToTest and pathToFileToTest are specified', () => {
+    const root = normalize('/root');
+    builder
+      .run({
+        root,
+        builder: '',
+        projectType: 'application',
+        options: {
+          fileToTest: 'lib.spec.ts',
+          pathToFileToTest: 'shared/util',
+          jestConfig: './jest.config.js',
+          tsConfig: './tsconfig.test.json',
+          watch: false
+        }
+      })
+      .toPromise();
+    expect(runCLI).toHaveBeenCalledWith(
+      {
+        globals: JSON.stringify({
+          _: ['shared/util/lib.spec.ts'],
+          'ts-jest': {
+            tsConfigFile: path.relative(root, './tsconfig.test.json')
+          },
+          __TRANSFORM_HTML__: true
+        }),
+        watch: false
+      },
+      ['./jest.config.js']
+    );
+  });
+
   it('should send other options to jestCLI', () => {
     const root = normalize('/root');
     builder
