@@ -4,11 +4,17 @@ jest.mock('jest');
 const { runCLI } = require('jest');
 import * as path from 'path';
 
+class TestJestBuilder extends JestBuilder {
+  getProjectForFile(filePath: string): any {
+    return super.getProjectForFile(filePath);
+  }
+}
+
 describe('Jest Builder', () => {
-  let builder: JestBuilder;
+  let builder: TestJestBuilder;
 
   beforeEach(() => {
-    builder = new JestBuilder();
+    builder = new TestJestBuilder();
     runCLI.mockReturnValue(
       Promise.resolve({
         results: {
@@ -46,31 +52,40 @@ describe('Jest Builder', () => {
     );
   });
 
-  it('should send appropriate options to jestCLI when fileToTest and pathToFileToTest are specified', () => {
+  it('should send appropriate options to jestCLI when testFile and testDirectory are specified', () => {
     const root = normalize('/root');
+
+    jest
+      .spyOn(builder, 'getProjectForFile')
+      .mockImplementation((_filePath: string) => {
+        return { root };
+      });
+
     builder
       .run({
         root,
         builder: '',
         projectType: 'application',
         options: {
-          fileToTest: 'lib.spec.ts',
-          pathToFileToTest: 'shared/util',
+          testFile: 'lib.spec.ts',
+          testDirectory: 'shared/util',
           jestConfig: './jest.config.js',
           tsConfig: './tsconfig.test.json',
+          codeCoverage: false,
           watch: false
         }
       })
       .toPromise();
     expect(runCLI).toHaveBeenCalledWith(
       {
+        _: ['lib.spec.ts'],
         globals: JSON.stringify({
-          _: ['shared/util/lib.spec.ts'],
           'ts-jest': {
             tsConfigFile: path.relative(root, './tsconfig.test.json')
           },
           __TRANSFORM_HTML__: true
         }),
+        coverage: false,
         watch: false
       },
       ['./jest.config.js']

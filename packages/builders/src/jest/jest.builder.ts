@@ -18,9 +18,9 @@ const { runCLI } = require('jest');
 
 export interface JestBuilderOptions {
   codeCoverage?: boolean;
-  fileToTest?: string;
   jestConfig: string;
-  pathToFileToTest?: string;
+  testDirectory?: string;
+  testFile?: string;
   setupFile?: string;
   tsConfig: string;
   all?: boolean;
@@ -117,12 +117,11 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
     builderConfig: BuilderConfiguration<JestBuilderOptions>
   ): Observable<BuildEvent> {
     const options = builderConfig.options;
-    const fileToTest = options.fileToTest;
 
-    if (fileToTest) {
-      const filePath = options.pathToFileToTest
-        ? path.resolve(options.pathToFileToTest, fileToTest)
-        : realpathSync(fileToTest);
+    if (options.testFile) {
+      const filePath = options.testDirectory
+        ? path.resolve(options.testDirectory, options.testFile)
+        : realpathSync(options.testFile);
 
       if (filePath) {
         const project = this.getProjectForFile(filePath);
@@ -137,7 +136,6 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
 
     const config: any = {
       ...options,
-      coverage: options.codeCoverage,
       globals: JSON.stringify({
         'ts-jest': {
           tsConfigFile: path.relative(builderConfig.root, options.tsConfig)
@@ -147,11 +145,15 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
     };
 
     delete config.codeCoverage;
-    delete config.fileToTest;
     delete config.jestConfig;
-    delete config.pathToFileToTest;
     delete config.setupFile;
+    delete config.testDirectory;
+    delete config.testFile;
     delete config.tsConfig;
+
+    if (options.codeCoverage !== undefined) {
+      config.coverage = options.codeCoverage;
+    }
 
     if (options.setupFile) {
       config.setupTestFrameworkScriptFile = path.join(
@@ -160,8 +162,8 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
       );
     }
 
-    if (fileToTest) {
-      config._ = [fileToTest];
+    if (options.testFile) {
+      config._ = [options.testFile];
     }
 
     return from(runCLI(config, [options.jestConfig])).pipe(
@@ -173,7 +175,7 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
     );
   }
 
-  private getProjectForFile(filePath: string): any {
+  protected getProjectForFile(filePath: string): any {
     // Load workspace configuration file.
     const configFileNames = [
       'angular.json',
@@ -183,14 +185,17 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
     ];
     const configFilePath = this.findUp(configFileNames, filePath);
     const angularJson = this.readJsonFile(configFilePath);
-    const project = Object.values<any>(angularJson.projects).find(project =>
-      this.isInFolder(
-        path.resolve(configFilePath, '..', project.root),
-        filePath
-      )
-    );
 
-    return project;
+    if (angularJson && angularJson.projects) {
+      const project = Object.values<any>(angularJson.projects).find(project =>
+        this.isInFolder(
+          path.resolve(configFilePath, '..', project.root),
+          filePath
+        )
+      );
+
+      return project;
+    }
   }
 
   private findUp(names: string | string[], from: string): string {
@@ -228,12 +233,18 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
    * @returns The JSON data in the file.
    */
   private readJsonFile<T = any>(path: string): T {
-    const contents = readFileSync(path, { encoding: 'utf-8' });
+    let jsonData = null;
 
-    try {
-      return JSON.parse(contents);
-    } catch (e) {
-      throw new Error(`Cannot parse ${path}: ${e.message}`);
+    if (path && existsSync(path)) {
+      const contents = readFileSync(path, { encoding: 'utf-8' });
+
+      try {
+        jsonData = JSON.parse(contents);
+      } catch (e) {
+        throw new Error(`Cannot parse ${path}: ${e.message}`);
+      }
     }
+
+    return jsonData;
   }
 }
