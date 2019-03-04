@@ -23,93 +23,20 @@ export interface JestBuilderOptions {
   testFile?: string;
   setupFile?: string;
   tsConfig: string;
-  all?: boolean;
-  automock?: boolean;
   bail?: boolean | number;
-  browser?: boolean;
-  cache?: boolean;
-  cacheDirectory?: string;
-  changedFilesWithAncestor?: boolean;
-  changedSince?: string;
   ci?: boolean;
-  clearCache?: boolean;
-  clearMocks?: boolean;
-  collectCoverage?: boolean;
-  collectCoverageFrom?: Array<string>;
-  collectCoverageOnlyFrom?: Array<string>;
-  config?: string;
-  coverage?: boolean;
-  coverageDirectory?: string;
-  coveragePathIgnorePatterns?: Array<string>;
-  coverageReporters?: Array<string>;
-  coverageThreshold?: string;
-  debug?: boolean;
-  env?: string;
-  expand?: boolean;
-  findRelatedTests?: boolean;
-  forceExit?: boolean;
-  globals?: string;
-  globalSetup?: string;
-  globalTeardown?: string;
-  haste?: string;
-  help?: boolean;
-  init?: boolean;
+  color?: boolean;
   json?: boolean;
-  lastCommit?: boolean;
-  logHeapUsage?: boolean;
   maxWorkers?: number;
-  moduleDirectories?: Array<string>;
-  moduleFileExtensions?: Array<string>;
-  moduleLoader?: string;
-  moduleNameMapper?: string;
-  modulePathIgnorePatterns?: Array<string>;
-  modulePaths?: Array<string>;
-  name?: string;
-  noSCM?: boolean;
-  noStackTrace?: boolean;
-  notify?: boolean;
-  notifyMode?: string;
   onlyChanged?: boolean;
   outputFile?: string;
   passWithNoTests?: boolean;
-  preset?: string;
-  projects?: Array<string>;
-  prettierPath?: string;
-  replname?: string;
-  resetMocks?: boolean;
-  resetModules?: boolean;
-  resolver?: string;
-  restoreMocks?: boolean;
-  rootDir?: string;
-  roots?: Array<string>;
   runInBand?: boolean;
-  setupFiles?: Array<string>;
-  setupFilesAfterEnv?: Array<string>;
-  showConfig?: boolean;
   silent?: boolean;
-  snapshotSerializers?: Array<string>;
-  testEnvironment?: string;
-  testFailureExitCode?: string;
-  testMatch?: Array<string>;
   testNamePattern?: string;
-  testPathIgnorePatterns?: Array<string>;
-  testPathPattern?: Array<string>;
-  testRegex?: string | Array<string>;
-  testResultsProcessor?: string;
-  testRunner?: string;
-  testURL?: string;
-  timers?: 'real' | 'fake';
-  transform?: string;
-  transformIgnorePatterns?: Array<string>;
-  unmockedModulePathPatterns?: Array<string>;
   updateSnapshot?: boolean;
   useStderr?: boolean;
-  verbose?: boolean;
-  version?: boolean;
   watch?: boolean;
-  watchAll?: boolean;
-  watchman?: boolean;
-  watchPathIgnorePatterns?: Array<string>;
 }
 
 export default class JestBuilder implements Builder<JestBuilderOptions> {
@@ -135,7 +62,21 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
     }
 
     const config: any = {
-      ...options,
+      coverage: options.codeCoverage,
+      bail: options.bail,
+      ci: options.ci,
+      color: options.color,
+      json: options.json,
+      maxWorkers: options.maxWorkers,
+      onlyChanged: options.onlyChanged,
+      outputFile: options.outputFile,
+      passWithNoTests: options.passWithNoTests,
+      runInBand: options.runInBand,
+      silent: options.silent,
+      testNamePattern: options.testNamePattern,
+      updateSnapshot: options.updateSnapshot,
+      useStderr: options.useStderr,
+      watch: options.watch,
       globals: JSON.stringify({
         'ts-jest': {
           tsConfigFile: path.relative(builderConfig.root, options.tsConfig)
@@ -143,17 +84,6 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
         __TRANSFORM_HTML__: true
       })
     };
-
-    delete config.codeCoverage;
-    delete config.jestConfig;
-    delete config.setupFile;
-    delete config.testDirectory;
-    delete config.testFile;
-    delete config.tsConfig;
-
-    if (options.codeCoverage !== undefined) {
-      config.coverage = options.codeCoverage;
-    }
 
     if (options.setupFile) {
       config.setupTestFrameworkScriptFile = path.join(

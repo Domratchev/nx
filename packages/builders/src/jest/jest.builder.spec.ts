@@ -72,6 +72,8 @@ describe('Jest Builder', () => {
           jestConfig: './jest.config.js',
           tsConfig: './tsconfig.test.json',
           codeCoverage: false,
+          runInBand: true,
+          testNamePattern: 'should load',
           watch: false
         }
       })
@@ -86,6 +88,8 @@ describe('Jest Builder', () => {
           __TRANSFORM_HTML__: true
         }),
         coverage: false,
+        runInBand: true,
+        testNamePattern: 'should load',
         watch: false
       },
       ['./jest.config.js']
@@ -102,17 +106,20 @@ describe('Jest Builder', () => {
         options: {
           jestConfig: './jest.config.js',
           tsConfig: './tsconfig.test.json',
-          watch: false,
           codeCoverage: true,
-          ci: true,
-          updateSnapshot: true,
-          onlyChanged: true,
-          passWithNoTests: true,
           bail: true,
-          silent: true,
-          runInBand: true,
+          color: false,
+          ci: true,
+          json: true,
           maxWorkers: 2,
-          testNamePattern: 'test'
+          onlyChanged: true,
+          outputFile: 'abc.txt',
+          passWithNoTests: true,
+          silent: true,
+          testNamePattern: 'test',
+          updateSnapshot: true,
+          useStderr: true,
+          watch: false
         }
       })
       .toPromise();
@@ -124,17 +131,20 @@ describe('Jest Builder', () => {
           },
           __TRANSFORM_HTML__: true
         }),
-        watch: false,
         coverage: true,
-        ci: true,
-        updateSnapshot: true,
-        onlyChanged: true,
-        passWithNoTests: true,
         bail: true,
-        silent: true,
-        runInBand: true,
+        color: false,
+        ci: true,
+        json: true,
         maxWorkers: 2,
-        testNamePattern: 'test'
+        onlyChanged: true,
+        outputFile: 'abc.txt',
+        passWithNoTests: true,
+        silent: true,
+        testNamePattern: 'test',
+        updateSnapshot: true,
+        useStderr: true,
+        watch: false
       },
       ['./jest.config.js']
     );
