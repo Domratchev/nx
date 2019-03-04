@@ -4,6 +4,30 @@
   "title": "Nx Application Options Schema",
   "type": "object",
   "properties": {
+    "framework": {
+      "description": "The Framework for the application.",
+      "type": "string",
+      "enum": ["angular", "react", "web-components"],
+      "default": "angular",
+      "x-prompt": {
+        "message": "What framework would you like to use for the application?",
+        "type": "list",
+        "items": [
+          {
+            "value": "angular",
+            "label": "Angular         [ https://angular.io   ]"
+          },
+          {
+            "value": "react",
+            "label": "React           [ https://reactjs.org/ ]"
+          },
+          {
+            "value": "web-components",
+            "label": "Web Components"
+          }
+        ]
+      }
+    },
     "name": {
       "description": "The name of the application.",
       "type": "string",
@@ -38,8 +62,7 @@
     "routing": {
       "type": "boolean",
       "description": "Generates a routing module.",
-      "default": false,
-      "x-prompt": "Would you like to add Angular routing?"
+      "default": false
     },
     "prefix": {
       "type": "string",
@@ -88,11 +111,11 @@
         "message": "Which Unit Test Runner would you like to use for the application?",
         "type": "list",
         "items": [
+          { "value": "jest", "label": "Jest   [ https://jestjs.io ]" },
           {
             "value": "karma",
             "label": "Karma [ https://karma-runner.github.io ]"
-          },
-          { "value": "jest", "label": "Jest   [ https://jestjs.io ]" }
+          }
         ]
       }
     },

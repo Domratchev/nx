@@ -65,6 +65,8 @@ export function copyMissingPackages(): void {
     'angular',
     '@angular/upgrade',
     '@angular-devkit/build-ng-packagr',
+    'codelyzer',
+    'ngrx-store-freeze',
     'npm-run-all',
     'yargs',
     'yargs-parser',
@@ -86,7 +88,15 @@ export function copyMissingPackages(): void {
     '@types/jasminewd2',
     '@nestjs',
     'express',
-    '@types/express'
+    '@types/express',
+
+    'react',
+    'react-dom',
+    '@types/react',
+    '@types/react-dom',
+    'react-testing-library',
+
+    'document-register-element'
   ];
   modulesToCopy.forEach(m => copyNodeModule(projectName, m));
   updateFile(

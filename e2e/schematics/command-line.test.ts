@@ -25,11 +25,11 @@ describe('Command line', () => {
     const validtaglib = uniq('validtaglib');
 
     newApp(`${myapp} --tags=validtag`);
-    newApp(`${myapp2}`);
-    newLib(`${mylib}`);
-    newLib(`${lazylib}`);
-    newLib(`${invalidtaglib} --tags=invalidtag`);
-    newLib(`${validtaglib} --tags=validtag`);
+    newApp(`${myapp2} --framework=angular`);
+    newLib(`${mylib} --framework=angular`);
+    newLib(`${lazylib} --framework=angular`);
+    newLib(`${invalidtaglib} --tags=invalidtag --framework=angular`);
+    newLib(`${validtaglib} --tags=validtag --framework=angular`);
 
     const tslint = readJson('tslint.json');
     tslint.rules['nx-enforce-module-boundaries'][1].depConstraints = [
@@ -91,7 +91,7 @@ describe('Command line', () => {
     const mylib = uniq('mylib');
 
     newApp(myapp);
-    newLib(mylib);
+    newLib(`${mylib} --framework=angular`);
     updateFile(
       `apps/${myapp}/src/main.ts`,
       `
@@ -181,9 +181,6 @@ describe('Command line', () => {
       `npm run workspace-schematic ${custom} ${workspace} -- --no-interactive --directory=dir -d`
     );
     expect(exists(`libs/dir/${workspace}/src/index.ts`)).toEqual(false);
-    expect(dryRunOutput).toContain(
-      `create libs/dir/${workspace}/src/lib/dir-${workspace}.module.ts`
-    );
     expect(dryRunOutput).toContain('update angular.json');
     expect(dryRunOutput).toContain('update nx.json');
 
@@ -191,9 +188,6 @@ describe('Command line', () => {
       `npm run workspace-schematic ${custom} ${workspace} -- --no-interactive --directory=dir`
     );
     checkFilesExist(`libs/dir/${workspace}/src/index.ts`);
-    expect(output).toContain(
-      `create libs/dir/${workspace}/src/lib/dir-${workspace}.module.ts`
-    );
     expect(output).toContain('update angular.json');
     expect(output).toContain('update nx.json');
 
@@ -223,8 +217,8 @@ describe('Command line', () => {
       newApp('myapp');
       newApp('myapp2');
       newApp('myapp3');
-      newLib('mylib');
-      newLib('mylib2');
+      newLib('mylib --framework=angular');
+      newLib('mylib2 --framework=angular');
 
       updateFile(
         'apps/myapp/src/main.ts',

@@ -19,7 +19,7 @@ const path = require('path');
  */
 const schematicsSourceDirectory = path.join(
   __dirname,
-  '../../build/packages/schematics/src'
+  '../../packages/schematics/src'
 );
 const schematicsOutputDirectory = path.join(
   __dirname,
@@ -29,6 +29,7 @@ const schematicCollectionFile = path.join(
   schematicsSourceDirectory,
   'collection.json'
 );
+fs.removeSync(schematicsOutputDirectory);
 const schematicCollection = fs.readJsonSync(schematicCollectionFile).schematics;
 const registry = new CoreSchemaRegistry();
 registry.addFormat(pathFormat);
@@ -73,19 +74,35 @@ function generateTemplate(schematic): { name: string; template: string } {
     ng generate ${schematic.name} ...
     ${schematic.alias ? `ng g ${schematic.name} ... # Same` : ''}
     \`\`\`
-    
-    ### Options
-    | Name | Alias | Description | Type | Default value |
-    |------|-------|-------------|------|---------------|\n`;
+    \n`;
 
-  schematic.options.forEach(
-    option =>
-      (template += dedent`| \`${option.name}\` ${
-        option.required ? '(*__required__*)' : ''
-      } ${option.hidden ? '(__hidden__)' : ''} | ${
-        !!option.aliases.length ? option.aliases.join(',') : ''
-      } | ${option.description} | ${option.type} | \`${option.default}\` | \n`)
-  );
+  if (Array.isArray(schematic.options) && !!schematic.options.length) {
+    template += '## Options';
+
+    schematic.options.forEach(
+      option =>
+        (template += dedent`
+          ### ${option.name} ${option.required ? '(*__required__*)' : ''} ${
+          option.hidden ? '(__hidden__)' : ''
+        }
+          
+          ${
+            !!option.aliases.length
+              ? `Alias(es): ${option.aliases.join(',')}\n`
+              : ''
+          }
+          ${
+            option.default === undefined || option.default === ''
+              ? ''
+              : `Default: \`${option.default}\`\n`
+          }
+          Type: \`${option.type}\` \n 
+          
+          
+          ${option.description}
+        `)
+    );
+  }
 
   return { name: schematic.name, template };
 }

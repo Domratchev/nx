@@ -22,18 +22,18 @@
       "type": "string",
       "enum": ["angular", "none"],
       "description": "The framework this library uses",
-      "default": "angular",
+      "default": "none",
       "x-prompt": {
         "message": "What framework should this library use?",
         "type": "list",
         "items": [
           {
-            "value": "angular",
-            "label": "Angular    [ https://angular.io/             ]"
-          },
-          {
             "value": "none",
             "label": "Typescript [ https://www.typescriptlang.org/ ]"
+          },
+          {
+            "value": "angular",
+            "label": "Angular    [ https://angular.io/             ]"
           }
         ]
       }
@@ -71,8 +71,7 @@
     },
     "parentModule": {
       "type": "string",
-      "description": "Update the router configuration of the parent module using loadChildren or children, depending on what `lazy` is set to.",
-      "x-prompt": "Which module should import the library?"
+      "description": "Update the router configuration of the parent module using loadChildren or children, depending on what `lazy` is set to."
     },
     "style": {
       "description": "The file extension to be used for style files.",
@@ -93,14 +92,12 @@
     "routing": {
       "type": "boolean",
       "default": false,
-      "description": "Add router configuration. See lazy for more information.",
-      "x-prompt": "Would you like to add a routing configuration to the library?"
+      "description": "Add router configuration. See lazy for more information."
     },
     "lazy": {
       "type": "boolean",
       "default": false,
-      "description": "Add RouterModule.forChild when set to true, and a simple array of routes when set to false.",
-      "x-prompt": "Will this library be lazy loaded?"
+      "description": "Add RouterModule.forChild when set to true, and a simple array of routes when set to false."
     },
     "module": {
       "type": "boolean",
@@ -121,8 +118,8 @@
         "message": "Which Unit Test Runner would you like to use for the library?",
         "type": "list",
         "items": [
-          { "value": "karma", "label": "Karma" },
-          { "value": "jest", "label": "Jest (https://jestjs.io/)" }
+          { "value": "jest", "label": "Jest [https://jestjs.io/]" },
+          { "value": "karma", "label": "Karma" }
         ]
       }
     }

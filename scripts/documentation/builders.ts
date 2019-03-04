@@ -18,13 +18,14 @@ import {
  */
 const buildersSourceDirectory = path.join(
   __dirname,
-  '../../build/packages/builders/src'
+  '../../packages/builders/src'
 );
 const buildersOutputDirectory = path.join(__dirname, '../../docs/api-builders');
 const builderCollectionFile = path.join(
   buildersSourceDirectory,
   'builders.json'
 );
+fs.removeSync(buildersOutputDirectory);
 const builderCollection = fs.readJsonSync(builderCollectionFile).builders;
 const registry = new CoreSchemaRegistry();
 registry.addFormat(pathFormat);
@@ -58,19 +59,35 @@ function generateTemplate(builder): { name: string; template: string } {
   let template = dedent`
     # ${builder.name}
     ${builder.description}
-    
-    ### Properties
-    | Name | Description | Type | Default value |
-    |------|-------------|------|---------------|\n`;
+    \n`;
 
-  builder.options.forEach(
-    option =>
-      (template += dedent`| \`${option.name}\` ${
-        option.required ? '(*__required__*)' : ''
-      } ${option.hidden ? '(__hidden__)' : ''} | ${option.description} | ${
-        option.type
-      } | \`${option.default}\` | \n`)
-  );
+  if (Array.isArray(builder.options) && !!builder.options.length) {
+    template += '## Properties';
+
+    builder.options.forEach(
+      option =>
+        (template += dedent`
+          ### ${option.name} ${option.required ? '(*__required__*)' : ''} ${
+          option.hidden ? '(__hidden__)' : ''
+        }
+          
+          ${
+            !!option.aliases.length
+              ? `Alias(es): ${option.aliases.join(',')}\n`
+              : ''
+          }
+          ${
+            option.default === undefined || option.default === ''
+              ? ''
+              : `Default: \`${option.default}\`\n`
+          }
+          Type: \`${option.type}\` \n 
+          
+          
+          ${option.description}
+        `)
+    );
+  }
 
   return { name: builder.name, template };
 }

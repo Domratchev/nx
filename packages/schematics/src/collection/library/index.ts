@@ -360,12 +360,17 @@ function updateProject(options: NormalizedSchema): Rule {
             outDir: `${offsetFromRoot(options.projectRoot)}dist/out-tsc/${
               options.projectRoot
             }`
-          }
+          },
+          angularCompilerOptions:
+            options.framework === Framework.Angular
+              ? json.angularCompilerOptions
+              : undefined
         };
       }),
       updateJsonInTree(`${options.projectRoot}/tslint.json`, json => {
         return {
           ...json,
+          rules: options.framework === Framework.Angular ? json.rules : [],
           extends: `${offsetFromRoot(options.projectRoot)}tslint.json`
         };
       }),
@@ -446,7 +451,8 @@ export default function(schema: Schema): Rule {
       options.unitTestRunner === 'jest'
         ? schematic('jest-project', {
             project: options.name,
-            skipSetupFile: options.framework !== Framework.Angular,
+            setupFile:
+              options.framework === Framework.Angular ? 'angular' : 'none',
             skipSerializers: options.framework !== Framework.Angular
           })
         : noop(),

@@ -9,7 +9,7 @@ const commandsOutputDirectory = path.join(
   __dirname,
   '../../docs/api-npmscripts'
 );
-
+fs.removeSync(commandsOutputDirectory);
 function getCommands(command) {
   return command.getCommandInstance().getCommandHandlers();
 }
@@ -42,21 +42,31 @@ function generateMarkdown(command) {
    `;
 
   if (Array.isArray(command.options) && !!command.options.length) {
-    template += dedent`
-      ### Options
-      | Option | Description | Default value |
-      |--------|-------------|---------------|\n`;
+    template += '## Options';
 
     command.options.forEach(
       option =>
-        (template += dedent`| \`${option.command}\` | ${option.description} | ${
-          option.default === undefined ? '' : `\`${option.default}\``
-        } | \n`)
+        (template += dedent`
+          ### ${option.command.replace('--', '')}
+          ${
+            option.default === undefined || option.default === ''
+              ? ''
+              : `Default: \`${option.default}\`\n`
+          }
+          ${option.description}
+        `)
     );
   }
 
-  return { name: command.command.replace(':', '-'), template };
+  return {
+    name: command.command
+      .replace(':', '-')
+      .replace(' ', '-')
+      .replace(/[\]\[.]+/gm, ''),
+    template
+  };
 }
+
 function generateFile(
   outputDirectory: string,
   templateObject: { name: string; template: string }
