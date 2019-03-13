@@ -4,17 +4,11 @@ jest.mock('jest');
 const { runCLI } = require('jest');
 import * as path from 'path';
 
-class TestJestBuilder extends JestBuilder {
-  getProjectForFile(filePath: string): any {
-    return super.getProjectForFile(filePath);
-  }
-}
-
 describe('Jest Builder', () => {
-  let builder: TestJestBuilder;
+  let builder: JestBuilder;
 
   beforeEach(() => {
-    builder = new TestJestBuilder();
+    builder = new JestBuilder();
     runCLI.mockReturnValue(
       Promise.resolve({
         results: {
@@ -56,7 +50,7 @@ describe('Jest Builder', () => {
     const root = normalize('/root');
 
     jest
-      .spyOn(builder, 'getProjectForFile')
+      .spyOn(builder as any, 'getProjectForFile')
       .mockImplementation((_filePath: string) => {
         return { root };
       });
