@@ -10,7 +10,8 @@ import {
   apply,
   template,
   move,
-  url
+  url,
+  MergeStrategy
 } from '@angular-devkit/schematics';
 import { Schema } from './schema';
 import * as ts from 'typescript';
@@ -108,7 +109,7 @@ function updateComponentTemplate(options: NormalizedSchema): Rule {
     const baseContent = `
 <div style="text-align:center">
   <h1>Welcome to {{title}}!</h1>
-  <img width="300" src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png">
+  <img width="450" src="https://raw.githubusercontent.com/nrwl/nx/master/nx-logo.png">
 </div>
 
 <p>This is an Angular app built with <a href="https://nx.dev">Nx</a>.</p>
@@ -153,10 +154,14 @@ function updateBuilders(options: NormalizedSchema): Rule {
   return (host: Tree) => {
     return updateJsonInTree(getWorkspacePath(host), json => {
       const project = json.projects[options.name];
+
+      delete project.architect['extract-i18n'];
+
       const buildOptions = project.architect.build;
       const serveOptions = project.architect.serve;
 
       buildOptions.builder = '@nrwl/builders:web-build';
+      delete buildOptions.options.es5BrowserSupport;
       delete buildOptions.configurations.production.aot;
       delete buildOptions.configurations.production.buildOptimizer;
 
@@ -193,7 +198,8 @@ function addApplicationFiles(options: NormalizedSchema): Rule {
         tmpl: ''
       }),
       move(options.appProjectRoot)
-    ])
+    ]),
+    MergeStrategy.Overwrite
   );
 }
 
@@ -533,6 +539,7 @@ export default function(schema: Schema): Rule {
         ? schematic('jest-project', {
             project: options.name,
             supportTsx: options.framework === Framework.React,
+            skipSerializers: options.framework !== Framework.Angular,
             setupFile:
               options.framework === Framework.Angular
                 ? 'angular'

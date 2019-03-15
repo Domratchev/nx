@@ -35,7 +35,7 @@ export function getBaseWebpackPartial(
     module: {
       rules: [
         {
-          test: /\.tsx?$/,
+          test: /\.(j|t)sx?$/,
           loader: `ts-loader`,
           options: {
             configFile: options.tsConfig,
@@ -70,13 +70,6 @@ export function getBaseWebpackPartial(
 
   if (options.progress) {
     extraPlugins.push(new ProgressPlugin());
-  }
-
-  if (options.optimization) {
-    webpackConfig.optimization = {
-      minimize: false,
-      concatenateModules: false
-    };
   }
 
   if (options.extractLicenses) {

@@ -30,6 +30,7 @@
     "@angular-devkit/build-webpack": "~0.13.1",
     "copy-webpack-plugin": "4.6.0",
     "fork-ts-checker-webpack-plugin": "0.4.9",
+    "identity-obj-proxy": "3.0.0",
     "license-webpack-plugin": "^1.4.0",
     "rxjs": "6.3.3",
     "ts-loader": "5.3.1",
@@ -39,6 +40,7 @@
     "@angular/core": "^7.2.7",
     "@angular/compiler": "^7.2.7",
     "@angular/cli": "7.3.1",
-    "@angular/compiler-cli": "~7.2.0"
+    "@angular/compiler-cli": "~7.2.0",
+    "zone.js": "0.8.29"
   }
 }

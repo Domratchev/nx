@@ -4,47 +4,11 @@ Run Jest unit tests
 
 ## Properties
 
-### codeCoverage
-
-Type: `boolean`
-
-Indicates that test coverage information should be collected and reported in the output. (https://jestjs.io/docs/en/cli.html#coverage)
-
-### jestConfig
-
-Type: `string`
-
-The path of the Jest configuration. (https://jestjs.io/docs/en/configuration.html)
-
-### testDirectory
-
-Type: `string`
-
-The path to the file to test. Only works when `testFile` is also specified.
-
-### testFile
-
-Type: `string`
-
-The name of the file to test. Might work alone or in conjunction with `testDirectory`.
-
-### tsConfig
-
-Type: `string`
-
-The name of the Typescript configuration file.
-
-### setupFile
-
-Type: `string`
-
-The name of a setup file used by Jest. (https://jestjs.io/docs/en/configuration.html#setuptestframeworkscriptfile-string)
-
 ### bail
 
 Alias(es): b
 
-Type: `boolean`
+Type: `number`
 
 Exit the test suite immediately after `n` number of failing tests. (https://jestjs.io/docs/en/cli#bail)
 
@@ -54,17 +18,29 @@ Type: `boolean`
 
 Whether to run Jest in continuous integration (CI) mode. This option is on by default in most popular CI environments. It will prevent snapshots from being written unless explicitly requested. (https://jestjs.io/docs/en/cli#ci)
 
+### codeCoverage
+
+Type: `boolean`
+
+Indicates that test coverage information should be collected and reported in the output. (https://jestjs.io/docs/en/cli#coverage)
+
 ### color
 
 Type: `boolean`
 
-Forces test results output color highlighting (even if stdout is not a TTY). Set to false if you would like to have no colors.
+Forces test results output color highlighting (even if stdout is not a TTY). Set to false if you would like to have no colors. (https://jestjs.io/docs/en/cli#colors)
+
+### jestConfig
+
+Type: `string`
+
+The path of the Jest configuration. (https://jestjs.io/docs/en/configuration)
 
 ### json
 
 Type: `boolean`
 
-Prints the test results in JSON. This mode will send all other test output and user messages to stderr.
+Prints the test results in JSON. This mode will send all other test output and user messages to stderr. (https://jestjs.io/docs/en/cli#json)
 
 ### maxWorkers
 
@@ -72,7 +48,7 @@ Alias(es): w
 
 Type: `number`
 
-Specifies the maximum number of workers the worker-pool will spawn for running tests. This defaults to the number of the cores available on your machine. Useful for CI. (its usually best not to override this default) (https://jestjs.io/docs/en/cli.html#maxworkers-num)
+Specifies the maximum number of workers the worker-pool will spawn for running tests. This defaults to the number of the cores available on your machine. Useful for CI. (its usually best not to override this default) (https://jestjs.io/docs/en/cli#maxworkers-num)
 
 ### onlyChanged
 
@@ -86,7 +62,7 @@ Attempts to identify which tests to run based on which files have changed in the
 
 Type: `string`
 
-Write test results to a file when the --json option is also specified.
+Write test results to a file when the --json option is also specified. (https://jestjs.io/docs/en/cli#outputfile-filename)
 
 ### passWithNoTests
 
@@ -100,7 +76,13 @@ Alias(es): i
 
 Type: `boolean`
 
-Run all tests serially in the current process (rather than creating a worker pool of child processes that run tests). This is sometimes useful for debugging, but such use cases are pretty rare. Useful for CI. (https://jestjs.io/docs/en/cli.html#runinband)
+Run all tests serially in the current process (rather than creating a worker pool of child processes that run tests). This is sometimes useful for debugging, but such use cases are pretty rare. Useful for CI. (https://jestjs.io/docs/en/cli#runinband)
+
+### setupFile
+
+Type: `string`
+
+The name of a setup file used by Jest. (https://jestjs.io/docs/en/configuration#setupfilesafterenv-array)
 
 ### silent
 
@@ -108,13 +90,31 @@ Type: `boolean`
 
 Prevent tests from printing messages through the console. (https://jestjs.io/docs/en/cli#silent)
 
+### testDirectory
+
+Type: `string`
+
+The path to the file to test. Only works when `testFile` is also specified.
+
+### testFile
+
+Type: `string`
+
+The name of the file to test. Might work alone or in conjunction with `testDirectory`.
+
 ### testNamePattern
 
 Alias(es): t
 
 Type: `string`
 
-Run only tests with a name that matches the regex pattern. (https://jestjs.io/docs/en/cli.html#testnamepattern-regex)
+Run only tests with a name that matches the regex pattern. (https://jestjs.io/docs/en/cli#testnamepattern-regex)
+
+### tsConfig
+
+Type: `string`
+
+The name of the Typescript configuration file.
 
 ### updateSnapshot
 
@@ -135,3 +135,9 @@ Divert all output to stderr.
 Type: `boolean`
 
 Watch files for changes and rerun tests related to changed files. If you want to re-run all tests when a file has changed, use the `--watchAll` option. (https://jestjs.io/docs/en/cli#watch)
+
+### watchAll
+
+Type: `boolean`
+
+Watch files for changes and rerun all tests when something changes. If you want to re-run only the tests that depend on the changed files, use the `--watch` option. (https://jestjs.io/docs/en/cli#watchall)

@@ -313,7 +313,7 @@ describe('app', () => {
 
       expect(angularJson.projects['my-app'].schematics).toEqual({
         '@nrwl/schematics:component': {
-          styleext: 'scss'
+          style: 'scss'
         }
       });
     });
@@ -414,6 +414,35 @@ describe('app', () => {
         expect(tree.readContent('apps/my-app/jest.config.js')).toContain(
           `moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'html'],`
         );
+      });
+
+      it('should setup jest without serializers', async () => {
+        const tree = await runSchematic(
+          'app',
+          {
+            name: 'my-App',
+            framework: Framework.React
+          },
+          appTree
+        );
+
+        expect(tree.readContent('apps/my-app/jest.config.js')).not.toContain(
+          `'jest-preset-angular/AngularSnapshotSerializer.js',`
+        );
+      });
+
+      it('should remove the extract-i18n target', async () => {
+        const tree = await runSchematic(
+          'app',
+          {
+            name: 'my-App',
+            framework: Framework.React
+          },
+          appTree
+        );
+        const angularJson = readJsonInTree(tree, 'angular.json');
+        const architectConfig = angularJson.projects['my-app'].architect;
+        expect(architectConfig['extract-i18n']).not.toBeDefined();
       });
 
       it('should setup the nrwl web build builder', async () => {

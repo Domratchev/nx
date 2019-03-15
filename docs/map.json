@@ -50,7 +50,7 @@
         "id": "05-add-node-app"
       },
       {
-        "name": "6 - Add Node Application",
+        "name": "6 - Configure Proxy",
         "id": "06-proxy"
       },
       {
@@ -120,6 +120,14 @@
       {
         "name": "Imposing Constraints on the Dependency Graph",
         "id": "monorepo-tags"
+      },
+      {
+        "name": "Using React",
+        "id": "react"
+      },
+      {
+        "name": "Building Angular and React Applications Together With Nx",
+        "id": "react-and-angular"
       },
       {
         "name": "Setting Up NgRx",

@@ -23,7 +23,7 @@ export interface JestBuilderOptions {
   testFile?: string;
   setupFile?: string;
   tsConfig: string;
-  bail?: boolean | number;
+  bail?: number | boolean;
   ci?: boolean;
   color?: boolean;
   json?: boolean;
@@ -37,6 +37,7 @@ export interface JestBuilderOptions {
   updateSnapshot?: boolean;
   useStderr?: boolean;
   watch?: boolean;
+  watchAll?: boolean;
 }
 
 export default class JestBuilder implements Builder<JestBuilderOptions> {
@@ -50,16 +51,31 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
         ? path.resolve(options.testDirectory, options.testFile)
         : realpathSync(options.testFile);
 
-      if (filePath) {
-        const project = this.getProjectForFile(filePath);
-
-        if (project && project.root !== builderConfig.root) {
-          return of({
-            success: true
-          });
-        }
+      if (filePath && !this._isInFolder(builderConfig.root, filePath)) {
+        return of({
+          success: true
+        });
       }
     }
+
+    const tsJestConfig = {
+      tsConfig: path.join(
+        '<rootDir>',
+        path.relative(builderConfig.root, options.tsConfig)
+      )
+    };
+
+    // TODO: This is hacky, We should probably just configure it in the user's workspace
+    // If jest-preset-angular is installed, apply settings
+    try {
+      require.resolve('jest-preset-angular');
+      Object.assign(tsJestConfig, {
+        stringifyContentPathRegex: '\\.html$',
+        astTransformers: [
+          'jest-preset-angular/InlineHtmlStripStylesTransformer'
+        ]
+      });
+    } catch (e) {}
 
     const config: any = {
       coverage: options.codeCoverage,
@@ -77,19 +93,19 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
       updateSnapshot: options.updateSnapshot,
       useStderr: options.useStderr,
       watch: options.watch,
+      watchAll: options.watchAll,
       globals: JSON.stringify({
-        'ts-jest': {
-          tsConfigFile: path.relative(builderConfig.root, options.tsConfig)
-        },
-        __TRANSFORM_HTML__: true
+        'ts-jest': tsJestConfig
       })
     };
 
     if (options.setupFile) {
-      config.setupTestFrameworkScriptFile = path.join(
-        '<rootDir>',
-        path.relative(builderConfig.root, options.setupFile)
-      );
+      config.setupFilesAfterEnv = [
+        path.join(
+          '<rootDir>',
+          path.relative(builderConfig.root, options.setupFile)
+        )
+      ];
     }
 
     if (options.testFile) {
@@ -105,76 +121,11 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
     );
   }
 
-  protected getProjectForFile(filePath: string): any {
-    // Load workspace configuration file.
-    const configFileNames = [
-      'angular.json',
-      '.angular.json',
-      'workspace.json',
-      '.workspace.json'
-    ];
-    const configFilePath = this.findUp(configFileNames, filePath);
-    const angularJson = this.readJsonFile(configFilePath);
-
-    if (angularJson && angularJson.projects) {
-      const project = Object.values<any>(angularJson.projects).find(project =>
-        this.isInFolder(
-          path.resolve(configFilePath, '..', project.root),
-          filePath
-        )
-      );
-
-      return project;
-    }
-  }
-
-  private findUp(names: string | string[], from: string): string {
-    if (!Array.isArray(names)) {
-      names = [names];
-    }
-    const root = path.parse(from).root;
-
-    let currentDir = from;
-    while (currentDir && currentDir !== root) {
-      for (const name of names) {
-        const p = path.join(currentDir, name);
-        if (existsSync(p)) {
-          return p;
-        }
-      }
-
-      currentDir = path.dirname(currentDir);
-    }
-
-    return null;
-  }
-
-  private isInFolder(parent: string, child: string): boolean {
+  private _isInFolder(parent: string, child: string): boolean {
     const relative = path.relative(parent, child);
 
     return (
       !!relative && !relative.startsWith('..') && !path.isAbsolute(relative)
     );
-  }
-
-  /**
-   * Read JSON file
-   * @param path The path to the JSON file
-   * @returns The JSON data in the file.
-   */
-  private readJsonFile<T = any>(path: string): T {
-    let jsonData = null;
-
-    if (path && existsSync(path)) {
-      const contents = readFileSync(path, { encoding: 'utf-8' });
-
-      try {
-        jsonData = JSON.parse(contents);
-      } catch (e) {
-        throw new Error(`Cannot parse ${path}: ${e.message}`);
-      }
-    }
-
-    return jsonData;
   }
 }

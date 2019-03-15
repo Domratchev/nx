@@ -36,9 +36,15 @@ describe('Jest Builder', () => {
       {
         globals: JSON.stringify({
           'ts-jest': {
-            tsConfigFile: path.relative(root, './tsconfig.test.json')
-          },
-          __TRANSFORM_HTML__: true
+            tsConfig: path.join(
+              '<rootDir>',
+              path.relative(root, './tsconfig.test.json')
+            ),
+            stringifyContentPathRegex: '\\.html$',
+            astTransformers: [
+              'jest-preset-angular/InlineHtmlStripStylesTransformer'
+            ]
+          }
         }),
         watch: false
       },
@@ -49,11 +55,7 @@ describe('Jest Builder', () => {
   it('should send appropriate options to jestCLI when testFile and testDirectory are specified', () => {
     const root = normalize('/root');
 
-    jest
-      .spyOn(builder as any, 'getProjectForFile')
-      .mockImplementation((_filePath: string) => {
-        return { root };
-      });
+    jest.spyOn(builder as any, '_isInFolder').mockImplementation(() => true);
 
     builder
       .run({
@@ -77,9 +79,15 @@ describe('Jest Builder', () => {
         _: ['lib.spec.ts'],
         globals: JSON.stringify({
           'ts-jest': {
-            tsConfigFile: path.relative(root, './tsconfig.test.json')
-          },
-          __TRANSFORM_HTML__: true
+            tsConfig: path.join(
+              '<rootDir>',
+              path.relative(root, './tsconfig.test.json')
+            ),
+            stringifyContentPathRegex: '\\.html$',
+            astTransformers: [
+              'jest-preset-angular/InlineHtmlStripStylesTransformer'
+            ]
+          }
         }),
         coverage: false,
         runInBand: true,
@@ -113,7 +121,8 @@ describe('Jest Builder', () => {
           testNamePattern: 'test',
           updateSnapshot: true,
           useStderr: true,
-          watch: false
+          watch: true,
+          watchAll: false
         }
       })
       .toPromise();
@@ -121,9 +130,15 @@ describe('Jest Builder', () => {
       {
         globals: JSON.stringify({
           'ts-jest': {
-            tsConfigFile: path.relative(root, './tsconfig.test.json')
-          },
-          __TRANSFORM_HTML__: true
+            tsConfig: path.join(
+              '<rootDir>',
+              path.relative(root, './tsconfig.test.json')
+            ),
+            stringifyContentPathRegex: '\\.html$',
+            astTransformers: [
+              'jest-preset-angular/InlineHtmlStripStylesTransformer'
+            ]
+          }
         }),
         coverage: true,
         bail: true,
@@ -138,7 +153,8 @@ describe('Jest Builder', () => {
         testNamePattern: 'test',
         updateSnapshot: true,
         useStderr: true,
-        watch: false
+        watch: true,
+        watchAll: false
       },
       ['./jest.config.js']
     );
@@ -163,14 +179,19 @@ describe('Jest Builder', () => {
       {
         globals: JSON.stringify({
           'ts-jest': {
-            tsConfigFile: path.relative(root, './tsconfig.test.json')
-          },
-          __TRANSFORM_HTML__: true
+            tsConfig: path.join(
+              '<rootDir>',
+              path.relative(root, './tsconfig.test.json')
+            ),
+            stringifyContentPathRegex: '\\.html$',
+            astTransformers: [
+              'jest-preset-angular/InlineHtmlStripStylesTransformer'
+            ]
+          }
         }),
-        setupTestFrameworkScriptFile: path.join(
-          '<rootDir>',
-          path.relative(root, './test.ts')
-        ),
+        setupFilesAfterEnv: [
+          path.join('<rootDir>', path.relative(root, './test.ts'))
+        ],
         watch: false
       },
       ['./jest.config.js']
