@@ -90,12 +90,6 @@ Type: `boolean`
 
 Prevent tests from printing messages through the console. (https://jestjs.io/docs/en/cli#silent)
 
-### testDirectory
-
-Type: `string`
-
-The path to the file to test. Only works when `testFile` is also specified.
-
 ### testFile
 
 Type: `string`

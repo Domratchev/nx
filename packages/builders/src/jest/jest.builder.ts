@@ -1,13 +1,13 @@
 import {
   Builder,
   BuilderConfiguration,
-  BuildEvent
+  BuildEvent,
+  BuilderContext
 } from '@angular-devkit/architect';
 
-import { from, Observable, of } from 'rxjs';
+import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { existsSync, readFileSync, realpathSync } from 'fs';
 import * as path from 'path';
 
 try {
@@ -19,7 +19,6 @@ const { runCLI } = require('jest');
 export interface JestBuilderOptions {
   codeCoverage?: boolean;
   jestConfig: string;
-  testDirectory?: string;
   testFile?: string;
   setupFile?: string;
   tsConfig: string;
@@ -41,28 +40,19 @@ export interface JestBuilderOptions {
 }
 
 export default class JestBuilder implements Builder<JestBuilderOptions> {
+  constructor(private context: BuilderContext) {}
   run(
     builderConfig: BuilderConfiguration<JestBuilderOptions>
   ): Observable<BuildEvent> {
     const options = builderConfig.options;
 
-    if (options.testFile) {
-      const filePath = options.testDirectory
-        ? path.resolve(options.testDirectory, options.testFile)
-        : realpathSync(options.testFile);
-
-      if (filePath && !this._isInFolder(builderConfig.root, filePath)) {
-        return of({
-          success: true
-        });
-      }
-    }
+    options.jestConfig = path.resolve(
+      this.context.workspace.root,
+      options.jestConfig
+    );
 
     const tsJestConfig = {
-      tsConfig: path.join(
-        '<rootDir>',
-        path.relative(builderConfig.root, options.tsConfig)
-      )
+      tsConfig: path.resolve(this.context.workspace.root, options.tsConfig)
     };
 
     // TODO: This is hacky, We should probably just configure it in the user's workspace
@@ -118,14 +108,6 @@ export default class JestBuilder implements Builder<JestBuilderOptions> {
           success: results.results.success
         };
       })
-    );
-  }
-
-  private _isInFolder(parent: string, child: string): boolean {
-    const relative = path.relative(parent, child);
-
-    return (
-      !!relative && !relative.startsWith('..') && !path.isAbsolute(relative)
     );
   }
 }

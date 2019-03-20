@@ -11,10 +11,6 @@
       "description": "The path of the Jest configuration. (https://jestjs.io/docs/en/configuration)",
       "type": "string"
     },
-    "testDirectory": {
-      "description": "The path to the file to test. Only works when `testFile` is also specified.",
-      "type": "string"
-    },
     "testFile": {
       "description": "The name of the file to test. Might work alone or in conjunction with `testDirectory`.",
       "type": "string"
